@@ -165,7 +165,7 @@ def main():
             st.error(f"Error: {str(e)}")
 
 def get_parking_phone(parking_name, city):
-    search_query = f"{parking_name} parking {city} teléfono contacto"
+    search_query = f"{parking_name} parking {city} teléfono contacto site:parclick.es"
     try:
         # Add user agent and pause between requests
         user_agents = [
@@ -178,9 +178,9 @@ def get_parking_phone(parking_name, city):
         }
         
         # Search in Google and take first 3 results
-        for url in search(search_query, num_results=3, lang="es"):
+        for url in search(search_query, num_results=3):
             try:
-                response = requests.get(url, timeout=5, headers=headers)
+                response = requests.get(url, timeout=10, headers=headers)
                 soup = BeautifulSoup(response.text, 'html.parser')
                 text_content = soup.get_text()
                 
@@ -197,7 +197,7 @@ def get_parking_phone(parking_name, city):
                         phone = re.sub(r'[\s-]', '', matches[0])
                         return phone
                 
-                time.sleep(random.uniform(2, 4))  # Random delay to avoid blocking
+                time.sleep(2)  # Fixed delay to avoid blocking
             except Exception as e:
                 continue
     except Exception as e:
