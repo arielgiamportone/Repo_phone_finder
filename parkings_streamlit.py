@@ -5,6 +5,7 @@ import pandas as pd
 import re
 from googlesearch import search
 import time
+import random
 
 # Add fallback cities dictionary
 CITIES = {
@@ -166,10 +167,20 @@ def main():
 def get_parking_phone(parking_name, city):
     search_query = f"{parking_name} parking {city} teléfono contacto"
     try:
+        # Add user agent and pause between requests
+        user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
+        ]
+        
+        headers = {
+            'User-Agent': random.choice(user_agents)
+        }
+        
         # Search in Google and take first 3 results
-        for url in search(search_query, num_results=3):
+        for url in search(search_query, num_results=3, lang="es"):
             try:
-                response = requests.get(url, timeout=5)
+                response = requests.get(url, timeout=5, headers=headers)
                 soup = BeautifulSoup(response.text, 'html.parser')
                 text_content = soup.get_text()
                 
@@ -186,11 +197,11 @@ def get_parking_phone(parking_name, city):
                         phone = re.sub(r'[\s-]', '', matches[0])
                         return phone
                 
-                time.sleep(2)  # Delay to avoid Google blocking
+                time.sleep(random.uniform(2, 4))  # Random delay to avoid blocking
             except Exception as e:
                 continue
     except Exception as e:
-        pass
+        st.warning(f"Error searching phone: {str(e)}")
     return "No encontrado"
 
 if __name__ == "__main__":
